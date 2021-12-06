@@ -1,0 +1,60 @@
+version: '3.9'
+services:
+  mysql-master1:
+    image: mysql:8.0
+    container_name: mysql-master1
+    restart: unless-stopped
+    env_file: master1/.env
+    command: --default-authentication-plugin=mysql_native_password
+    cap_add:
+      - all
+    volumes:
+      - ./master1/my.cnf:/etc/mysql/my.cnf
+      - ./master1/data:/var/lib/mysql
+    environment:
+      - TZ:${TZ}
+      - MYSQL_USER:${MYSQL_USER}
+      - MYSQL_PASSWORD:${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD:${MYSQL_PASSWORD}
+    networks:
+      default:
+        aliases:
+          - mysql
+
+  mysql-master2:
+    image: mysql:8.0
+    container_name: mysql-master2
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    env_file: master2/.env
+    cap_add: 
+      - all
+    volumes:
+      - ./master2/my.cnf:/etc/mysql/my.cnf
+      - ./master2/data:/var/lib/mysql
+    environment:
+      - TZ:${TZ}
+      - MYSQL_USER:${MYSQL_USER}
+      - MYSQL_PASSWORD:${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD:${MYSQL_PASSWORD}
+    networks:
+      default:
+        aliases:
+          - mysql
+
+  haproxy:
+    image: haproxytech/haproxy-ubuntu:latest
+    container_name: haproxy
+    restart: unless-stopped
+    ports: 
+      - "2999:2999"
+      - "3306:3306"
+    cap_add:
+      - all
+    volumes:
+      - ./haproxy.cfg:/etc/haproxy/haproxy.cfg
+    networks:
+      default:
+        aliases:
+          - mysql
+  

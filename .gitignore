@@ -1,0 +1,5 @@
+.env
+master2/.env
+master1/.env
+master1/data
+master2/data
